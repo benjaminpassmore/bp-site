@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>bp</title>
+  <meta name="description" content="Listen to bp on Spotify, Apple Music, and YouTube.">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f3f2f2">
+  <link rel="canonical" href="https://bp.studio">
+
+  <!-- Favicons (placeholders — supply /favicon.ico and /favicon.svg) -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+  <!-- Self-hosted font (placeholder — supply /fonts/archivo-800.woff2; falls back to system fonts) -->
+  <!-- Once the file exists, uncomment for faster first paint:
+  <link rel="preload" href="/fonts/archivo-800.woff2" as="font" type="font/woff2" crossorigin> -->
+
+  <!-- Open Graph / Twitter (placeholder image — supply /og-image.png, 1200x630) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bp.studio">
+  <meta property="og:title" content="bp">
+  <meta property="og:description" content="Listen to bp on Spotify, Apple Music, and YouTube.">
+  <meta property="og:image" content="https://bp.studio/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="bp">
+  <meta name="twitter:description" content="Listen to bp on Spotify, Apple Music, and YouTube.">
+  <meta name="twitter:image" content="https://bp.studio/og-image.png">
+
+  <style>
+    @font-face {
+      font-family: "Archivo";
+      font-weight: 800;
+      font-display: swap;
+      src: local("Archivo ExtraBold"), local("Archivo-ExtraBold"),
+           url("/fonts/archivo-800.woff2") format("woff2");
+    }
+
+    :root {
+      --bg: #f3f2f2;          /* ground */
+      --ink: #201e1d;         /* text */
+      --accent: #ec3013;      /* single red accent */
+      --accent-pressed: #ae1800;
+      --rule: 2px solid var(--ink);
+      --gutter: clamp(1rem, 3.5vw, 3rem);
+      --font: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
+    }
+    ::selection { background: rgba(236, 48, 19, 0.3); }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
+    /* Four equal rows filling the viewport, divided by strong 2px rules */
+    .links {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      min-height: 100svh;  /* stable height under mobile browser bars */
+      display: grid;
+      grid-auto-rows: minmax(112px, 1fr);
+      border-bottom: var(--rule);
+    }
+    .links li + li { border-top: var(--rule); }
+
+    /* Row layout: index top-left, arrow top-right, label full-width at the bottom */
+    .links a {
+      height: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: "num arrow" "label label";
+      grid-template-rows: auto 1fr;
+      gap: 0.5rem var(--gutter);
+      padding: var(--gutter) max(var(--gutter), env(safe-area-inset-right)) var(--gutter) max(var(--gutter), env(safe-area-inset-left));
+      color: var(--ink);
+      text-decoration: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 150ms ease, color 150ms ease;
+    }
+
+    .num {
+      font-size: clamp(0.75rem, 0.7rem + 0.3vw, 0.9375rem);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      font-variant-numeric: tabular-nums;
+      grid-area: num;
+    }
+    /* Keep first/last rows clear of notches and home indicators */
+    .links li:first-child a { padding-top: max(var(--gutter), env(safe-area-inset-top)); }
+    .links li:last-child a { padding-bottom: max(var(--gutter), env(safe-area-inset-bottom)); }
+    .label {
+      font-weight: 800;
+      grid-area: label;
+      align-self: end;
+      font-size: clamp(2.5rem, min(14vw, 13svh), 9rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .arrow {
+      width: clamp(1.75rem, min(7vw, 7svh), 4rem);
+      height: auto;
+      grid-area: arrow;
+      align-self: start;
+      stroke: currentColor;
+      transition: transform 150ms ease;
+    }
+
+    /* Hover / focus: the whole row floods red */
+    /* Hover only on real pointers, so taps don't leave a row stuck red */
+    @media (hover: hover) {
+      .links a:hover { background: var(--accent); color: var(--bg); }
+      .links a:hover .arrow { transform: translate(4px, -4px); }
+    }
+    .links a:focus-visible { background: var(--accent); color: var(--bg); }
+    .links a:focus-visible .arrow { transform: translate(4px, -4px); }
+    /* Instant tap feedback on touch */
+    .links a:active { background: var(--accent-pressed); color: var(--bg); transition: none; }
+
+    .links a:focus { outline: none; }
+    .links a:focus-visible { outline: 2px solid var(--ink); outline-offset: -6px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .links a, .arrow { transition: none; }
+      .links a:hover .arrow, .links a:focus-visible .arrow { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="sr-only">bp</h1>
+
+  <nav aria-label="Listen to bp">
+    <ul class="links" id="links">
+      <noscript>
+        <li><a href="https://open.spotify.com/artist/7HNSQ7MjClgngPMDwHLXV4"><span class="num">01</span><span class="label">Spotify</span></a></li>
+        <li><a href="https://music.apple.com/us/artist/bp/1835789821"><span class="num">02</span><span class="label">Apple Music</span></a></li>
+        <li><a href="https://youtube.com/@bpppppppppp"><span class="num">03</span><span class="label">YouTube</span></a></li>
+        <li><a href="https://www.instagram.com/bp"><span class="num">04</span><span class="label">Instagram</span></a></li>
+      </noscript>
+    </ul>
+  </nav>
+
+  <script>
+    /* ------------------------------------------------------------------
+       LINKS CONFIG — edit, add, remove or reorder links here.
+       One entry per line: { label: "Text shown", url: "https://..." }
+       (If you change these, update the <noscript> fallback above too.)
+       ------------------------------------------------------------------ */
+    const LINKS = [
+      { label: "Spotify",     url: "https://open.spotify.com/artist/7HNSQ7MjClgngPMDwHLXV4" },
+      { label: "Apple Music", url: "https://music.apple.com/us/artist/bp/1835789821" },
+      { label: "YouTube",     url: "https://youtube.com/@bpppppppppp" },
+      { label: "Instagram",   url: "https://www.instagram.com/bp" },
+    ];
+
+    // Lucide "arrow-up-right" icon
+    const ARROW = '<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>';
+
+    // Render rows: index number, label, arrow (links open in the same tab)
+    document.getElementById("links").innerHTML = LINKS.map(({ label, url }, i) =>
+      `<li><a href="${url}"><span class="num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span><span class="label">${label}</span>${ARROW}</a></li>`
+    ).join("");
+  </script>
+
+  <!-- ANALYTICS SLOT: paste an analytics snippet (e.g. GoatCounter) here. None enabled. -->
+
+</body>
+</html>
